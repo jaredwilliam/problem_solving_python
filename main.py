@@ -7,6 +7,10 @@ import seaborn as sns
 sns.set_theme()
 
 
+def generate_single_guess(pool: list) -> str:
+    return random.choice(pool)
+
+
 def generate_guess(pool: list, length: int) -> list:
     guess = random.choices(pool, k=length)
     return guess
@@ -36,12 +40,88 @@ def score_simulation(guesses: list, answer: list) -> list:
     return pct_correct_per_sim
 
 
-def plot_pct_correct_vs_sim(scores) -> None:
-    # results should be a list of scores
+def variance(scores: list) -> float:
+    return np.var(scores)
+
+
+def stdDev(scores: list) -> float:
+    return np.std(scores)
+
+
+def plot_pct_correct_vs_sim(scores: list) -> None:
+    fig, ax = plt.subplots()
+    ax.scatter(range(len(scores)), scores)
+    plt.show()
+
+
+def plot_histogram(scores: list) -> None:
+
+    # Freedman-Diaconis Rule for bins
+    max_value = max(scores)
+    min_value = min(scores)
+    n = len(scores)
+    iqr = np.subtract(*np.percentile(scores, [75, 25]))
+    h = 2 * iqr * n ** (-1 / 3)
+    bins = int((max_value - min_value) / h)
 
     fig, ax = plt.subplots()
+    ax.hist(scores, bins=bins)
+    plt.show()
 
-    ax.scatter(range(len(scores)), scores)
+
+def hill_climb_guessing(pool: list, target: str, guess_results_list: bool = False):
+    final_solution = []
+    guess_results = []
+    target_index = 0
+
+    while len(final_solution) < len(target):
+        guess = generate_single_guess(pool)
+
+        if guess == target[target_index]:
+            guess_results.append(1)
+            final_solution.append(guess)
+            target_index += 1
+        else:
+            guess_results.append(0)
+
+    if guess_results_list:
+        return guess_results
+    else:
+        return len(guess_results)
+
+
+def hill_climb_simulation(
+    pool: list, target: str, num_sims: int = 1, guess_results_list: bool = False
+) -> list:
+    guess_counts = []
+
+    for _ in range(num_sims):
+        guess_counts.append(hill_climb_guessing(pool, target, guess_results_list))
+
+    return guess_counts
+
+
+def calc_cumulative_correct_guesses(guesses: list) -> list:
+    # Needed because the sublists are not guaranteed to be the same size
+    result = []
+
+    for guess_list in guesses:
+        result.append(np.cumsum(guess_list))
+    return result
+
+
+def plot_cumlative_correct_guesses(guesses: list) -> None:
+
+    # x_axis_len = 0
+    # for guess_list in guesses:
+    #     if len(guess_list) > x_axis_len:
+    #         x_axis_len = len(guess_list)
+
+    fig, ax = plt.subplots()
+    for guess in guesses:
+        ax.step(
+            range(len(guess)), guess, where="post", color="cornflowerblue", alpha=0.5
+        )
     plt.show()
 
 
@@ -81,33 +161,17 @@ if __name__ == "__main__":
 
     target_len = len(target)
 
-    guesses = simulate_guesses(pool=pool, length=target_len, num_sims=1000)
-    simulation_scores = score_simulation(guesses, target)
-    plot_pct_correct_vs_sim(simulation_scores)
+    # guesses = simulate_guesses(pool=pool, length=target_len, num_sims=1000)
+    # simulation_scores = score_simulation(guesses, target)
+    # plot_pct_correct_vs_sim(simulation_scores)
+    # plot_histogram(simulation_scores)
+    # plot_histogram(hill_climb_guesses)
 
-    # guess_limit = 10000
+    # * Hill Climbing
+    hill_climb_guesses = hill_climb_simulation(pool, target, 1000, True)
+    cumulative_guesses = calc_cumulative_correct_guesses(hill_climb_guesses)
+    # for cum_guess in cumulative_guesses:
+    #     print(cum_guess)
+    # cumulative_sums = np.cumsum(hill_climb_guesses, axis=1)
 
-    # best_guess = None
-    # best_score = 0
-
-    # for i in range(guess_limit):
-    #     guess = generate_guess(pool=pool, length=target_len)
-    #     score = score_guess(guess, target)
-
-    #     if score > best_score:
-    #         best_guess = guess
-    #         best_score = score
-    # print(list(zip(best_guess, target)))
-    # print(best_score)
-
-    # target_as_list = [ch for ch in target]
-    # zipped = list(zip(guess, target_as_list))
-
-    # for i, pair in enumerate(zipped):
-    #     if pair[0] == pair[1]:
-    #         print(":)")
-    #     else:
-    #         print(":(")
-
-    # for g_i, t_i in enumerate(zip(guess, target_as_list)):
-    #     print(g_i, t_i)
+    plot_cumlative_correct_guesses(cumulative_guesses)
