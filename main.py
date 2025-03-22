@@ -1,4 +1,10 @@
 import random
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_theme()
 
 
 def generate_guess(pool: list, length: int) -> list:
@@ -22,13 +28,21 @@ def score_guess(guess: list, answer: list) -> float:
     return correct / length
 
 
-def score_simulation(guesses: list, answer: list) -> float:
+def score_simulation(guesses: list, answer: list) -> list:
     # average percent of correct characters
     pct_correct_per_sim = []
     for guess in guesses:
         pct_correct_per_sim.append(score_guess(guess, answer))
-    mean = sum(pct_correct_per_sim) / len(guesses)
-    return mean
+    return pct_correct_per_sim
+
+
+def plot_pct_correct_vs_sim(scores) -> None:
+    # results should be a list of scores
+
+    fig, ax = plt.subplots()
+
+    ax.scatter(range(len(scores)), scores)
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -68,7 +82,8 @@ if __name__ == "__main__":
     target_len = len(target)
 
     guesses = simulate_guesses(pool=pool, length=target_len, num_sims=1000)
-    print(score_simulation(guesses, target))
+    simulation_scores = score_simulation(guesses, target)
+    plot_pct_correct_vs_sim(simulation_scores)
 
     # guess_limit = 10000
 
