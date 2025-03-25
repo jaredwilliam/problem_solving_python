@@ -1,0 +1,1 @@
+A simple class building out a Fraction object to better understand OOP. 
