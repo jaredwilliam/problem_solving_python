@@ -1,5 +1,7 @@
-# shakespeare_monkey
-Simple program to see how long it takes Python to generate some Shakespeare like a monkey on a typewriter
+# Problem Solving with Python
 
-I grabbed this idea from reading [Runestone Academy Problem Solving with Algorithms and Data Structures](https://runestone.academy/ns/course/index).
+All items in this repo are exercises from [Runestone Academy Problem Solving with Algorithms and Data Structures](https://runestone.academy/ns/course/index).
 
+## Contents
+- [Shakespeare Monkey](shakespeare_monkey\README.md) - how many attempts does it take to generate a sentence when selecting letters randomly
+- [Fraction](fraction\README.md) - an exercise to better understand OOP
