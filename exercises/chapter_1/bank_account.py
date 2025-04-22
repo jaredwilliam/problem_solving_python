@@ -15,6 +15,9 @@ class BankAccount:
     def withdraw(self, withdraw_amount):
         self.amount -= withdraw_amount
 
+    def transfer(self, other, transfer_amount):
+        pass
+
 
 class CheckingAccount(BankAccount):
     def __init__(self, name, amount=0):
